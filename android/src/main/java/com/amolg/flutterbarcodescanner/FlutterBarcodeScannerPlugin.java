@@ -48,6 +48,7 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
     public static String lineColor = "";
     public static boolean isShowFlashIcon = false;
     public static boolean isContinuousScan = false;
+    public static String manualFocusMode = "";
     static EventChannel.EventSink barcodeStream;
     private EventChannel eventChannel;
 
@@ -115,16 +116,19 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
 
                 isContinuousScan = (boolean) arguments.get("isContinuousScan");
 
-                startBarcodeScannerActivityView((String) arguments.get("cancelButtonText"), isContinuousScan);
+                manualFocusMode = (String) arguments.get("manualFocusMode");
+
+                startBarcodeScannerActivityView((String) arguments.get("cancelButtonText"), isContinuousScan, manualFocusMode);
             }
         } catch (Exception e) {
             Log.e(TAG, "onMethodCall: " + e.getLocalizedMessage());
         }
     }
 
-    private void startBarcodeScannerActivityView(String buttonText, boolean isContinuousScan) {
+    private void startBarcodeScannerActivityView(String buttonText, boolean isContinuousScan, String manualFocusMode) {
         try {
             Intent intent = new Intent(activity, BarcodeCaptureActivity.class).putExtra("cancelButtonText", buttonText);
+            intent.putExtra("manualFocusMode", manualFocusMode);
             if (isContinuousScan) {
                 activity.startActivity(intent);
             } else {

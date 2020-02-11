@@ -84,6 +84,8 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
     private ImageView imgViewBarcodeCaptureUseFlash;
 
+    String manualFocusMode = "";
+
     public static int SCAN_MODE = SCAN_MODE_ENUM.QR.ordinal();
 
     public enum SCAN_MODE_ENUM {
@@ -115,6 +117,14 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 buttonText = "Cancel";
                 Log.e("BCActivity:onCreate()", "onCreate: " + e.getLocalizedMessage());
             }
+
+            manualFocusMode = "";
+            try {
+                manualFocusMode = (String) getIntent().getStringExtra("manualFocusMode");
+            } catch (Exception e) {
+                Log.e("BCActivity:onCreate()", "onCreate: " + e.getLocalizedMessage());
+            }
+
             imgViewBarcodeCaptureUseFlash = findViewById(R.id.imgViewBarcodeCaptureUseFlash);
             Button btnBarcodeCaptureCancel = findViewById(R.id.btnBarcodeCaptureCancel);
             btnBarcodeCaptureCancel.setText(buttonText);
@@ -132,7 +142,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             // permission is not granted yet, request permission.
             int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (rc == PackageManager.PERMISSION_GRANTED) {
-                createCameraSource(autoFocus, useFlash);
+                createCameraSource(manualFocusMode, useFlash);
             } else {
                 requestCameraPermission();
             }
@@ -193,7 +203,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
      * the constant.
      */
     @SuppressLint("InlinedApi")
-    private void createCameraSource(boolean autoFocus, boolean useFlash) {
+    private void createCameraSource(String manualFocusMode, boolean useFlash) {
         Context context = getApplicationContext();
 
         // A barcode detector is created to track barcodes.  An associated multi-processor instance
@@ -227,7 +237,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         // make sure that auto focus is an available option
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             builder = builder.setFocusMode(
-                    autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
+                    (manualFocusMode == null || manualFocusMode == "") ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : manualFocusMode);
         }
 
         mCameraSource = builder
@@ -296,7 +306,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             // we have permission, so create the camerasource
             boolean autoFocus = true;
             boolean useFlash = false;
-            createCameraSource(autoFocus, useFlash);
+            createCameraSource(manualFocusMode, useFlash);
             return;
         }
 
