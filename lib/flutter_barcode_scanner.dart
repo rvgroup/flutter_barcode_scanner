@@ -21,7 +21,7 @@ class FlutterBarcodeScanner {
   /// cancelButtonText is text of cancel button
   /// isShowFlashIcon is bool to show or hide flash icon
   static Future<String> scanBarcode(String lineColor, String cancelButtonText,
-      bool isShowFlashIcon, ScanMode scanMode) async {
+      bool isShowFlashIcon, ScanMode scanMode, { String manualFocusMode = "" }) async {
     if (null == cancelButtonText || cancelButtonText.isEmpty)
       cancelButtonText = "Cancel";
 
@@ -35,7 +35,8 @@ class FlutterBarcodeScanner {
       "cancelButtonText": cancelButtonText,
       "isShowFlashIcon": isShowFlashIcon,
       "isContinuousScan": false,
-      "scanMode": scanMode.index
+      "scanMode": scanMode.index,
+      "manualFocusMode": manualFocusMode
     };
 
     /// Get barcode scan result
@@ -50,7 +51,7 @@ class FlutterBarcodeScanner {
   /// It will return stream of barcode strings.
   /// Parameters will e same as #scanBarcode
   static Stream getBarcodeStreamReceiver(String lineColor,
-      String cancelButtonText, bool isShowFlashIcon, ScanMode scanMode) {
+      String cancelButtonText, bool isShowFlashIcon, ScanMode scanMode, { String manualFocusMode = "" }) {
     if (null == cancelButtonText || cancelButtonText.isEmpty)
       cancelButtonText = "Cancel";
 
@@ -64,7 +65,8 @@ class FlutterBarcodeScanner {
       "cancelButtonText": cancelButtonText,
       "isShowFlashIcon": isShowFlashIcon,
       "isContinuousScan": true,
-      "scanMode": scanMode.index
+      "scanMode": scanMode.index,
+      "manualFocusMode": manualFocusMode
     };
 
     /// Invoke method to open camera
