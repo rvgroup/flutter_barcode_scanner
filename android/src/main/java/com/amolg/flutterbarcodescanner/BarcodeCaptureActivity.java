@@ -101,6 +101,23 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
     private int flashStatus = USE_FLASH.OFF.ordinal();
 
+    CameraSource.AutoFocusCallback mAutoFocusListener  =
+            new CameraSource.AutoFocusCallback() {
+                @Override
+                public void onAutoFocus(boolean success) {
+                    Log.d("camera", "autofocus complete");
+
+                    Camera camera = mCameraSource.getCamera();
+
+                    Camera.Parameters param = camera.getParameters();
+                    float[] distances = new float[3];
+                    param.getFocusDistances(distances);
+                    Log.d("camera", "near index = " + distances[Camera.Parameters.FOCUS_DISTANCE_NEAR_INDEX]);
+                    Log.d("camera", "optimal index = " + distances[Camera.Parameters.FOCUS_DISTANCE_OPTIMAL_INDEX]);
+                    Log.d("camera", "far index = " + distances[Camera.Parameters.FOCUS_DISTANCE_FAR_INDEX]);
+                }
+            };
+
     /**
      * Initializes the UI and creates the detector pipeline.
      */
@@ -149,7 +166,6 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
             gestureDetector = new GestureDetector(this, new CaptureGestureListener());
             scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
-
         } catch (Exception e) {
         }
     }
@@ -187,6 +203,10 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        if (e.getAction() == MotionEvent.ACTION_DOWN) {
+            mCameraSource.autoFocus(mAutoFocusListener);
+        }
+
         boolean b = scaleGestureDetector.onTouchEvent(e);
 
         boolean c = gestureDetector.onTouchEvent(e);
@@ -234,15 +254,21 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 .setRequestedPreviewSize(1600, 1024)
                 .setRequestedFps(15.0f);
 
+        boolean hasManualFocus = manualFocusMode != null && !manualFocusMode.isEmpty();
+
         // make sure that auto focus is an available option
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             builder = builder.setFocusMode(
-                    (manualFocusMode == null || manualFocusMode == "") ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : manualFocusMode);
+                    !hasManualFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : manualFocusMode);
         }
 
         mCameraSource = builder
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .build();
+
+        if (hasManualFocus) {
+            mCameraSource.autoFocus(mAutoFocusListener);
+        }
     }
 
     /**

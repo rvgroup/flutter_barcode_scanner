@@ -264,6 +264,10 @@ public class CameraSource {
         void onAutoFocusMoving(boolean start);
     }
 
+    public Camera getCamera() {
+        return mCamera;
+    }
+
     /**
      * Stops the camera and releases the resources of the camera and underlying detector.
      */
