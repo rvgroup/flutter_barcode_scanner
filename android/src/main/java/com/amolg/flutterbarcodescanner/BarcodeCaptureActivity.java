@@ -166,8 +166,20 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
             gestureDetector = new GestureDetector(this, new CaptureGestureListener());
             scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
+
+            this.showToast(R.string.tap_to_autofocus);
         } catch (Exception e) {
         }
+    }
+
+    private void showToast(int resId) {
+        String msg = this.getResources().getString(resId);
+
+        showToast(msg);
+    }
+
+    private void showToast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     /**
